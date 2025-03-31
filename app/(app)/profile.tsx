@@ -20,12 +20,14 @@ import { updateUserProfile, uploadProfilePicture } from '../../services/user';
 import { User, GenderSchema } from '../../types/user';
 import { z } from 'zod';
 import { Dropdown } from '../../components/ui/Dropdown';
+import { router } from 'expo-router';
 
 export default function ProfileScreen() {
-  const { user, updateUserData } = useAuth();
+  const { user, updateUserData, signOut } = useAuth();
   const { colors, typography, spacing, borderRadius, shadows } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   
   // Form state
   const [name, setName] = useState(user?.name || '');
@@ -142,6 +144,33 @@ export default function ProfileScreen() {
     }
   };
   
+  const handleSignOut = async () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          onPress: async () => {
+            try {
+              setIsSigningOut(true);
+              await signOut();
+              // The redirect is handled by the AuthContext
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+              setIsSigningOut(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+  
   const renderProfileImage = () => {
     if (isUploading) {
       return (
@@ -215,7 +244,7 @@ export default function ProfileScreen() {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Gender</Text>
           <Dropdown
-            label="Gender"
+            label=""
             value={gender}
             options={genderOptions}
             onValueChange={(value) => setGender(value as z.infer<typeof GenderSchema>)}
@@ -240,6 +269,18 @@ export default function ProfileScreen() {
           loading={isLoading}
           fullWidth
           style={styles.updateButton}
+        />
+
+        <View style={styles.divider} />
+
+        <Button
+          title="Sign Out"
+          onPress={handleSignOut}
+          variant="error"
+          loading={isSigningOut}
+          disabled={isSigningOut}
+          fullWidth
+          style={styles.logoutButton}
         />
       </View>
     </ScrollView>
@@ -335,5 +376,13 @@ const styles = StyleSheet.create({
   },
   updateButton: {
     marginTop: 24,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E0E0E0',
+    marginVertical: 24,
+  },
+  logoutButton: {
+    marginBottom: 24,
   },
 }); 

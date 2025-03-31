@@ -5,6 +5,7 @@ import { useTheme } from '../../constants/theme';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SignInScreen() {
   const { colors, spacing, typography } = useTheme();
@@ -31,7 +32,12 @@ export default function SignInScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
+      <View style={styles.logoContainer}>
+        <Ionicons name="gift-outline" size={64} color={colors.primary} style={styles.logo} />
+        <Text style={[styles.brandName, { color: colors.primary }]}>BUNDLE</Text>
+      </View>
+      
+      <Text style={[styles.welcomeText, { color: colors.text }]}>Welcome to Bundle!</Text>
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
         Sign in to continue
       </Text>
@@ -93,6 +99,24 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logo: {
+    marginBottom: 8,
+  },
+  brandName: {
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: 2,
+  },
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   title: {
     fontSize: 32,

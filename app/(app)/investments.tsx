@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../constants/theme';
-import { BundleTest } from '../../components/BundleTest';
 
 export default function Investments() {
   const { colors, typography, spacing, borderRadius, shadows } = useTheme();
+  const windowWidth = Dimensions.get('window').width;
 
   const portfolio = {
     totalInvested: 5000,
@@ -13,30 +13,88 @@ export default function Investments() {
     averageReturn: 9,
   };
 
-  const opportunities = [
-    {
-      id: 1,
-      title: 'Small Business Bundle',
-      description: 'A curated bundle of loans to small businesses across East Africa',
-      riskLevel: 'Medium',
-      expectedReturn: 8.5,
-      minInvestment: 100,
-      duration: '12 months',
-      diversification: 15,
-      sectors: ['Retail', 'Agriculture', 'Crafts'],
-    },
-    {
-      id: 2,
-      title: 'Women Entrepreneurs Fund',
-      description: 'Support women-led businesses in emerging markets',
-      riskLevel: 'Low',
-      expectedReturn: 7.2,
-      minInvestment: 50,
-      duration: '9 months',
-      diversification: 25,
-      sectors: ['Technology', 'Education', 'Healthcare'],
-    },
-  ];
+  // Define the Investment Opportunity interface
+  interface InvestmentOpportunity {
+    id: number;
+    title: string;
+    description: string;
+    riskLevel: string;
+    expectedReturn: number;
+    minInvestment: number;
+    duration: string;
+    diversification: number;
+    sectors: string[];
+    location: string;
+  }
+
+  // Generate 50 investment opportunities
+  const generateOpportunities = (): InvestmentOpportunity[] => {
+    const sectors = [
+      ['Retail', 'Agriculture', 'Crafts'],
+      ['Technology', 'Education', 'Healthcare'],
+      ['Manufacturing', 'Tourism', 'Food Production'],
+      ['Clean Energy', 'Water', 'Infrastructure'],
+      ['Transportation', 'Logistics', 'Financial Services'],
+      ['Arts', 'Media', 'Entertainment'],
+      ['Fashion', 'Textiles', 'Housing'],
+      ['Waste Management', 'Recycling', 'Sustainability'],
+    ];
+    
+    const bundleTypes = [
+      'Small Business Bundle',
+      'Women Entrepreneurs Fund',
+      'Youth Innovation Portfolio',
+      'Agricultural Development Fund',
+      'Tech Startups Collective',
+      'Sustainable Energy Projects',
+      'Microfinance Initiative',
+      'Community Housing Network',
+      'Healthcare Accessibility Fund',
+      'Education Empowerment Bundle',
+    ];
+    
+    const locations = [
+      'Kenya', 'Uganda', 'Tanzania', 'Rwanda', 'Ethiopia',
+      'Nigeria', 'Ghana', 'South Africa', 'Zambia', 'Senegal',
+      'Botswana', 'Namibia', 'Mozambique', 'Malawi', 'Zimbabwe',
+      'Ivory Coast', 'Cameroon', 'Benin', 'Togo', 'Mali',
+      'Egypt', 'Morocco', 'Tunisia', 'Algeria', 'Sudan',
+      'Angola', 'Liberia', 'Sierra Leone', 'Gambia', 'Mauritius',
+      'Seychelles', 'Cape Verde', 'Lesotho', 'Eswatini', 'Burundi',
+      'Congo', 'Gabon', 'Guinea', 'Burkina Faso', 'Niger',
+      'Madagascar', 'Comoros', 'Somalia', 'Djibouti', 'Eritrea',
+      'South Sudan', 'Central African Republic', 'Chad', 'Libya', 'Mauritania'
+    ];
+    
+    const riskLevels = ['Low', 'Medium', 'High'];
+    
+    return Array.from({ length: 50 }, (_, i) => {
+      const randomReturn = (5 + Math.random() * 10).toFixed(1);
+      const randomInvestment = Math.floor(50 + Math.random() * 200);
+      const randomDuration = Math.floor(3 + Math.random() * 21);
+      const randomDiversification = Math.floor(5 + Math.random() * 30);
+      const randomRisk = riskLevels[Math.floor(Math.random() * riskLevels.length)];
+      const randomSectors = sectors[Math.floor(Math.random() * sectors.length)];
+      const location = locations[i % locations.length]; // Ensure each has a unique location
+      const bundleType = bundleTypes[Math.floor(Math.random() * bundleTypes.length)];
+      const title = `${location} ${bundleType}`;
+      
+      return {
+        id: i + 1,
+        title,
+        description: `Support entrepreneurs and businesses in ${location} with a diverse portfolio of ${randomDiversification} loans`,
+        riskLevel: randomRisk,
+        expectedReturn: parseFloat(randomReturn),
+        minInvestment: randomInvestment,
+        duration: `${randomDuration} months`,
+        diversification: randomDiversification,
+        sectors: randomSectors,
+        location
+      };
+    });
+  };
+
+  const opportunities = generateOpportunities();
 
   const styles = StyleSheet.create({
     container: {
@@ -169,11 +227,88 @@ export default function Investments() {
       fontSize: typography.sizes.base,
       fontWeight: '600' as const,
     },
+    horizontalListContainer: {
+      padding: spacing.lg,
+    },
   });
+
+  const renderOpportunityCard = ({ item }: { item: InvestmentOpportunity }) => (
+    <View style={[styles.opportunityCard, { width: windowWidth * 0.85 }]}>
+      <View style={styles.cardHeader}>
+        <Text style={[styles.opportunityTitle, { color: colors.text }]}>
+          {item.title}
+        </Text>
+        <View style={styles.riskBadge}>
+          <Text style={[styles.riskText, { color: colors.badgeText }]}>
+            {item.riskLevel} Risk
+          </Text>
+        </View>
+      </View>
+
+      <Text style={[styles.description, { color: colors.textSecondary }]}>
+        {item.description}
+      </Text>
+
+      <View style={styles.detailsGrid}>
+        <View style={styles.detailItem}>
+          <Ionicons name="trending-up" size={20} color={colors.primary} />
+          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
+            Expected Return
+          </Text>
+          <Text style={[styles.detailValue, { color: colors.text }]}>
+            {item.expectedReturn}%
+          </Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Ionicons name="time" size={20} color={colors.primary} />
+          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
+            Duration
+          </Text>
+          <Text style={[styles.detailValue, { color: colors.text }]}>
+            {item.duration}
+          </Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Ionicons name="wallet" size={20} color={colors.primary} />
+          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
+            Min. Investment
+          </Text>
+          <Text style={[styles.detailValue, { color: colors.text }]}>
+            ${item.minInvestment}
+          </Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Ionicons name="location" size={20} color={colors.primary} />
+          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
+            Location
+          </Text>
+          <Text style={[styles.detailValue, { color: colors.text }]}>
+            {item.location}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.sectors}>
+        <Text style={[styles.sectorsLabel, { color: colors.text }]}>Sectors:</Text>
+        <View style={styles.sectorTags}>
+          {item.sectors.map((sector, index) => (
+            <View key={index} style={styles.sectorTag}>
+              <Text style={[styles.sectorText, { color: colors.tagText }]}>
+                {sector}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.investButton}>
+        <Text style={styles.investButtonText}>Invest Now</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <BundleTest />
       <View style={[styles.header, { backgroundColor: colors.background }]}>
         <Text style={[styles.title, { color: colors.text }]}>Investment Portfolio</Text>
         
@@ -218,80 +353,17 @@ export default function Investments() {
           Investment Opportunities
         </Text>
         
-        {opportunities.map((opportunity) => (
-          <View key={opportunity.id} style={styles.opportunityCard}>
-            <View style={styles.cardHeader}>
-              <Text style={[styles.opportunityTitle, { color: colors.text }]}>
-                {opportunity.title}
-              </Text>
-              <View style={styles.riskBadge}>
-                <Text style={[styles.riskText, { color: colors.badgeText }]}>
-                  {opportunity.riskLevel} Risk
-                </Text>
-              </View>
-            </View>
-
-            <Text style={[styles.description, { color: colors.textSecondary }]}>
-              {opportunity.description}
-            </Text>
-
-            <View style={styles.detailsGrid}>
-              <View style={styles.detailItem}>
-                <Ionicons name="trending-up" size={20} color={colors.primary} />
-                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-                  Expected Return
-                </Text>
-                <Text style={[styles.detailValue, { color: colors.text }]}>
-                  {opportunity.expectedReturn}%
-                </Text>
-              </View>
-              <View style={styles.detailItem}>
-                <Ionicons name="time" size={20} color={colors.primary} />
-                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-                  Duration
-                </Text>
-                <Text style={[styles.detailValue, { color: colors.text }]}>
-                  {opportunity.duration}
-                </Text>
-              </View>
-              <View style={styles.detailItem}>
-                <Ionicons name="wallet" size={20} color={colors.primary} />
-                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-                  Min. Investment
-                </Text>
-                <Text style={[styles.detailValue, { color: colors.text }]}>
-                  ${opportunity.minInvestment}
-                </Text>
-              </View>
-              <View style={styles.detailItem}>
-                <Ionicons name="git-branch" size={20} color={colors.primary} />
-                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-                  Diversification
-                </Text>
-                <Text style={[styles.detailValue, { color: colors.text }]}>
-                  {opportunity.diversification} loans
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.sectors}>
-              <Text style={[styles.sectorsLabel, { color: colors.text }]}>Sectors:</Text>
-              <View style={styles.sectorTags}>
-                {opportunity.sectors.map((sector, index) => (
-                  <View key={index} style={styles.sectorTag}>
-                    <Text style={[styles.sectorText, { color: colors.tagText }]}>
-                      {sector}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-
-            <TouchableOpacity style={styles.investButton}>
-              <Text style={styles.investButtonText}>Invest Now</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+        <FlatList
+          data={opportunities}
+          renderItem={renderOpportunityCard}
+          keyExtractor={item => item.id.toString()}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          snapToAlignment="center"
+          snapToInterval={windowWidth * 0.85 + spacing.lg}
+          decelerationRate="fast"
+          contentContainerStyle={styles.horizontalListContainer}
+        />
       </View>
     </ScrollView>
   );
