@@ -1,4 +1,4 @@
-# HP25-Bundle 🎯
+# HP25-Bundle for HackPrinceton Spring 2025
 
 **Decentralized Microlending Platform**  
 Capital One Honorable Mention (HackPrinceton 2025)
